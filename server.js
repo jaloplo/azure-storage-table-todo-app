@@ -1,11 +1,29 @@
+const fs = require('fs');
 const express = require('express');
 
-let app = express();
+const PORT = process.env.PORT || 3001;
 
-app.get('/', (req, res) => {
-    res.send('<h1>Hello World</h1>');
-})
+const app = express();
+app.use(express.static(__dirname + '/static'));
 
-app.listen(3001, function() {
-    console.log('Listening on port 3001...');
+app.engine('html', function(path, options, callback) {
+    fs.readFile(path, (err, content) => {
+        if(err) {
+            return callback(err);
+        }
+
+        if(content) {
+            return callback(null, content.toString());
+        }
+    });
+});
+app.set('views', './views');
+app.set('view engine', 'html');
+
+app.get('/', function(req, res) {
+    res.render('landing');
+});
+
+app.listen(PORT, function() {
+    console.log(`web server listening on port ${PORT}`);
 });
