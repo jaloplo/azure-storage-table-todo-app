@@ -5,6 +5,7 @@
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Montserrat:200,400&display=swap" rel="stylesheet">
         <link href="/styles.css" rel="stylesheet">
+        <script src="/app.js" defer="true"></script>
     </head>
     <body>
         <div class="app">
@@ -42,21 +43,5 @@
             </div>
 
         </div>
-
-        <script>
-            new Vue({
-                el: '.todos',
-                data: {
-                    todos: [
-                        { category: 'personal', id: 1, title: 'todo sample', done: false },
-                        { category: 'todo app', id: 2, title: 'todo sample 2', done: true },
-                        { category: 'personal', id: 3, title: 'todo sample 3', done: false },
-                        { category: 'personal', id: 4, title: 'todo sample', done: false },
-                        { category: 'todo app', id: 5, title: 'todo sample 2', done: true },
-                        { category: 'personal', id: 6, title: 'todo sample 3', done: false }
-                    ]
-                }
-            });
-        </script>
     </body>
 </html>
