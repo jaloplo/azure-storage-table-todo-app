@@ -1,3 +1,62 @@
+let business = feathers();
+
+business.use('table', {
+    async find(params) {
+        let url = `${this.base_url}${this.table}${this.sas}`;
+
+        return superagent
+            .get(url)
+            .set('Accept', 'application/json');
+    },
+
+    async create(data, params) {
+        let url = `${this.base_url}${this.table}${this.sas}`;
+
+        return new Promise((resolve, reject) => {
+            superagent
+                .post(url)
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
+                .send({
+                    PartitionKey: 'personal',
+                    RowKey: data.title,
+                    title: data.title,
+                    done: false
+                })
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+            });
+    },
+
+    async update(id, data, params) {
+        let url = `${this.base_url}${this.table}(PartitionKey='${data.key}',RowKey='${data.row}')${this.sas}`;
+
+        return new Promise((resolve, reject) => {
+            superagent
+                .put(url)
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
+                .send({
+                    PartitionKey: data.key,
+                    RowKey: data.row,
+                    title: data.title,
+                    done: data.done
+                })
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+            });
+    },
+
+    setup(app, path) {
+        this.name = 'storetodoapp001';
+        this.base_url = `https://${this.name}.table.core.windows.net/`;
+        this.table = 'todos';
+        this.sas = '?sv=2019-02-02&ss=t&srt=sco&sp=rwlacu&se=2020-02-29T06:06:35Z&st=2020-02-11T22:06:35Z&spr=https&sig=XYRJzKv1WM18RSWb2XhORFIz6e5JNQsBdzlw%2FB1mttw%3D';
+    }
+});
+
+business.setup();
+
 /*
     TODO COMPONENT
 */
@@ -109,38 +168,24 @@ let AppContent = Vue.extend({
     template: '<div class="app__content"><TodoList :todos="todos" @done="doneTodo"/><Intro @add="addTodo"/></div>',
     methods: {
         addTodo(title) {
-            let service_url = 'https://storetodoapp001.table.core.windows.net/';
-            let table_name = 'todos';
-            let sas = '?sv=2019-02-02&ss=t&srt=sco&sp=rwlacu&se=2020-02-29T06:06:35Z&st=2020-02-11T22:06:35Z&spr=https&sig=XYRJzKv1WM18RSWb2XhORFIz6e5JNQsBdzlw%2FB1mttw%3D';
-
-            let url = `${service_url}${table_name}${sas}`;
-
-            superagent.post(url)
-                .set('Accept', 'application/json')
-                .set('Content-Type', 'application/json')
-                .send({
-                    PartitionKey: 'personal',
-                    RowKey: title,
-                    title: title,
-                    done: false
+            business
+                .service('table')
+                .create({
+                    title: title
                 })
-                .then(res => {
-                    superagent.get(url)
-                        .set('Accept', 'application/json')
-                        .then(res => {
-                            let response = res.text;
-                            this.todos = JSON.parse(response).value.map(x => {
-                                return {
-                                    PartitionKey: x.PartitionKey,
-                                    RowKey: x.RowKey,
-                                    title: x.title,
-                                    done: x.done === true
-                                };
-                            });
-                        })
-                        .catch(err => {
-                            console.log('>>> ERROR');
-                        });
+                .then(() => {
+                    return business.service('table').find();
+                })
+                .then((res) => { 
+                    let response = res.text;
+                    this.todos = JSON.parse(response).value.map(x => {
+                        return {
+                            PartitionKey: x.PartitionKey,
+                            RowKey: x.RowKey,
+                            title: x.title,
+                            done: x.done === true
+                        };
+                    });
                 })
                 .catch(err => {
                     console.log('>>> ERROR');
@@ -149,40 +194,29 @@ let AppContent = Vue.extend({
         },
 
         doneTodo(key, row) {
-            let service_url = 'https://storetodoapp001.table.core.windows.net/';
-            let table_name = 'todos';
-            let sas = '?sv=2019-02-02&ss=t&srt=sco&sp=rwlacu&se=2020-02-29T06:06:35Z&st=2020-02-11T22:06:35Z&spr=https&sig=XYRJzKv1WM18RSWb2XhORFIz6e5JNQsBdzlw%2FB1mttw%3D';
+            let todo = this.todos.filter(x => x.PartitionKey === key && x.RowKey === row)[0];
 
-            let url = `${service_url}${table_name}(PartitionKey='${key}',RowKey='${row}')${sas}`;
-
-            superagent.put(url)
-                .set('Accept', 'application/json')
-                .set('Content-Type', 'application/json')
-                .send({
-                    PartitionKey: key,
-                    RowKey: row,
-                    title: this.todos.filter(x => x.PartitionKey === key && x.RowKey === row)[0].title,
-                    done: !this.todos.filter(x => x.PartitionKey === key && x.RowKey === row)[0].done
+            business
+                .service('table')
+                .update(null, {
+                    key: key,
+                    row: row,
+                    title: todo.title,
+                    done: !todo.done
                 })
-                .then(res => {
-                    url = `${service_url}${table_name}${sas}`;
-                    superagent.get(url)
-                        .set('Accept', 'application/json')
-                        .then(res => {
-                            let response = res.text;
-                            this.todos = JSON.parse(response).value.map(x => {
-                                return {
-                                    PartitionKey: x.PartitionKey,
-                                    RowKey: x.RowKey,
-                                    title: x.title,
-                                    done: x.done === true
-                                };
-                            });
-                        })
-                        .catch(err => {
-                            console.log('>>> ERROR');
-                            console.log(err);
-                        });
+                .then(() => {
+                    return business.service('table').find();
+                })
+                .then((res) => { 
+                    let response = res.text;
+                    this.todos = JSON.parse(response).value.map(x => {
+                        return {
+                            PartitionKey: x.PartitionKey,
+                            RowKey: x.RowKey,
+                            title: x.title,
+                            done: x.done === true
+                        };
+                    });
                 })
                 .catch(err => {
                     console.log('>>> ERROR');
@@ -191,14 +225,9 @@ let AppContent = Vue.extend({
         }
     },
     beforeCreate() {
-        let service_url = 'https://storetodoapp001.table.core.windows.net/';
-        let table_name = 'todos';
-        let sas = '?sv=2019-02-02&ss=t&srt=sco&sp=rwlacu&se=2020-02-29T06:06:35Z&st=2020-02-11T22:06:35Z&spr=https&sig=XYRJzKv1WM18RSWb2XhORFIz6e5JNQsBdzlw%2FB1mttw%3D';
-
-        let url = `${service_url}${table_name}${sas}`;
-
-        superagent.get(url)
-            .set('Accept', 'application/json')
+        business
+            .service('table')
+            .find()
             .then(res => {
                 let response = res.text;
                 this.todos = JSON.parse(response).value.map(x => {
