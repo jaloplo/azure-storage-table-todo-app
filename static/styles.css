@@ -1,0 +1,278 @@
+a, body, button, div, h1, input, label, li, p, small, span, ul {
+    animation : none;
+    animation-delay : 0;
+    animation-direction : normal;
+    animation-duration : 0;
+    animation-fill-mode : none;
+    animation-iteration-count : 1;
+    animation-name : none;
+    animation-play-state : running;
+    animation-timing-function : ease;
+    backface-visibility : visible;
+    background : 0;
+    background-attachment : scroll;
+    background-clip : border-box;
+    background-color : transparent;
+    background-image : none;
+    background-origin : padding-box;
+    background-position : 0 0;
+    background-position-x : 0;
+    background-position-y : 0;
+    background-repeat : repeat;
+    background-size : auto auto;
+    border : 0;
+    border-style : none;
+    border-width : medium;
+    border-color : inherit;
+    border-bottom : 0;
+    border-bottom-color : inherit;
+    border-bottom-left-radius : 0;
+    border-bottom-right-radius : 0;
+    border-bottom-style : none;
+    border-bottom-width : medium;
+    border-collapse : separate;
+    border-image : none;
+    border-left : 0;
+    border-left-color : inherit;
+    border-left-style : none;
+    border-left-width : medium;
+    border-radius : 0;
+    border-right : 0;
+    border-right-color : inherit;
+    border-right-style : none;
+    border-right-width : medium;
+    border-spacing : 0;
+    border-top : 0;
+    border-top-color : inherit;
+    border-top-left-radius : 0;
+    border-top-right-radius : 0;
+    border-top-style : none;
+    border-top-width : medium;
+    bottom : auto;
+    box-shadow : none;
+    box-sizing : content-box;
+    caption-side : top;
+    clear : none;
+    clip : auto;
+    color : inherit;
+    columns : auto;
+    column-count : auto;
+    column-fill : balance;
+    column-gap : normal;
+    column-rule : medium none currentColor;
+    column-rule-color : currentColor;
+    column-rule-style : none;
+    column-rule-width : none;
+    column-span : 1;
+    column-width : auto;
+    content : normal;
+    counter-increment : none;
+    counter-reset : none;
+    cursor : auto;
+    direction : ltr;
+    display : inline;
+    empty-cells : show;
+    float : none;
+    font : normal;
+    font-family : inherit;
+    font-size : medium;
+    font-style : normal;
+    font-variant : normal;
+    font-weight : normal;
+    height : auto;
+    hyphens : none;
+    left : auto;
+    letter-spacing : normal;
+    line-height : normal;
+    list-style : none;
+    list-style-image : none;
+    list-style-position : outside;
+    list-style-type : disc;
+    margin : 0;
+    margin-bottom : 0;
+    margin-left : 0;
+    margin-right : 0;
+    margin-top : 0;
+    max-height : none;
+    max-width : none;
+    min-height : 0;
+    min-width : 0;
+    opacity : 1;
+    orphans : 0;
+    outline : 0;
+    outline-color : invert;
+    outline-style : none;
+    outline-width : medium;
+    overflow : visible;
+    overflow-x : visible;
+    overflow-y : visible;
+    padding : 0;
+    padding-bottom : 0;
+    padding-left : 0;
+    padding-right : 0;
+    padding-top : 0;
+    page-break-after : auto;
+    page-break-before : auto;
+    page-break-inside : auto;
+    perspective : none;
+    perspective-origin : 50% 50%;
+    position : static;
+    /* May need to alter quotes for different locales (e.g fr) */
+    quotes : '\201C' '\201D' '\2018' '\2019';
+    right : auto;
+    tab-size : 8;
+    table-layout : auto;
+    text-align : inherit;
+    text-align-last : auto;
+    text-decoration : none;
+    text-decoration-color : inherit;
+    text-decoration-line : none;
+    text-decoration-style : solid;
+    text-indent : 0;
+    text-shadow : none;
+    text-transform : none;
+    top : auto;
+    transform : none;
+    transform-style : flat;
+    transition : none;
+    transition-delay : 0s;
+    transition-duration : 0s;
+    transition-property : none;
+    transition-timing-function : ease;
+    unicode-bidi : normal;
+    vertical-align : baseline;
+    visibility : visible;
+    white-space : normal;
+    widows : 0;
+    width : auto;
+    word-spacing : normal;
+    z-index : auto;
+    /* basic modern patch */
+    all: initial;
+    all: unset;
+}
+
+
+body { 
+    display: block; 
+    width: 100%; 
+}
+
+.input {
+    border-bottom: solid 1px #aaa69d;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 200;
+    padding: 7px 2px;
+    width: 80%;
+}
+
+input::placeholder {
+    color: lightgray;
+}
+
+
+
+.app {
+    border: solid 2px #34ace0;
+    border-radius: 10px;
+    display: block;
+    margin: 20px auto;
+    width: 600px;
+}
+
+.app__content {
+    display: block;
+}
+
+.app__header {
+    background-color: #34ace0;
+    border-bottom: solid 1px #34ace0;
+    padding-bottom: 10px;
+    padding-top: 100px;
+}
+
+
+.app__title {
+    color: white;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 200;
+    margin: 0 20px;
+    padding-bottom: 20px;
+}
+
+.app__subtitle {
+    color: white;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 200;
+    margin: 0 20px;
+    padding-bottom: 10px;
+}
+
+
+.intro {
+    border-top: solid 2px #34ace0;
+    display: block;
+    width: 100%;
+}
+
+.intro__content {
+    display: inline-block;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.intro__text {
+    border-bottom-color: #34ace0;
+}
+
+
+
+.todos {
+    display: block;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.todos__item {
+    border-bottom: solid 1px #34ace0;
+    display: inline-block;
+    padding: 15px 0;
+    width: 100%;
+}
+
+.todos__done {
+    display: inline-block;
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+.todos__done > input {
+    position: absolute;
+    left: -9999px;
+}
+
+.todos__done > input + label {
+    border: solid 1px #34ace0;
+    border-radius: 50%;
+    display: block;
+    height: 25px;
+    position: relative;
+    top: 7px;
+    width: 25px;
+}
+
+.todos__done > input:checked + label {
+    background-color: #34ace0;
+}
+
+.todos__title {
+    color: #34ace0;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}

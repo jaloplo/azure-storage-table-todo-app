@@ -2,8 +2,61 @@
 <html>
     <head>
         <title>Azure Storage Table Todo App</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:200,400&display=swap" rel="stylesheet">
+        <link href="/styles.css" rel="stylesheet">
     </head>
     <body>
-        <h1>Hello world!!!</h1>
+        <div class="app">
+
+            <header class="app__header">
+                <h1 class="app__title">Azure Storage Table Todo App</h1>
+                <p class="app__subtitle">Thursday 13 Feb</p>
+            </header>
+
+            <div class="app__content">
+
+                <ul class="todos">
+                    <li class="todos__item">
+                        <div class="todos__done">
+                            <input type="checkbox" id="check1" />
+                            <label for="check1"></label>
+                        </div>
+                        <div class="todos__title">Lorem ipsum dolor sit amet</div>
+                    </li>
+                    <li class="todos__item">
+                        <div class="todos__done">
+                            <input type="checkbox" id="check2" checked/>
+                            <label for="check2"></label>
+                        </div>
+                        <div class="todos__title">Lorem ipsum dolor sit amet</div>                  
+                    </li>
+                </ul>
+
+                <div class="intro">
+                    <div class="intro__content">
+                        <input class="input intro__text" type="text" placeholder="Add a task"/>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <script>
+            new Vue({
+                el: '.todos',
+                data: {
+                    todos: [
+                        { category: 'personal', id: 1, title: 'todo sample', done: false },
+                        { category: 'todo app', id: 2, title: 'todo sample 2', done: true },
+                        { category: 'personal', id: 3, title: 'todo sample 3', done: false },
+                        { category: 'personal', id: 4, title: 'todo sample', done: false },
+                        { category: 'todo app', id: 5, title: 'todo sample 2', done: true },
+                        { category: 'personal', id: 6, title: 'todo sample 3', done: false }
+                    ]
+                }
+            });
+        </script>
     </body>
 </html>
