@@ -17,31 +17,33 @@ business.use('table', {
                 .post(url)
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
-                .send({
-                    PartitionKey: 'personal',
-                    RowKey: data.title,
-                    title: data.title,
-                    done: false
-                })
+                .send(data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
             });
     },
 
     async update(id, data, params) {
-        let url = `${this.base_url}${this.table}(PartitionKey='${data.key}',RowKey='${data.row}')${this.sas}`;
+        let url = `${this.base_url}${this.table}(PartitionKey='${data.PartitionKey}',RowKey='${data.RowKey}')${this.sas}`;
 
         return new Promise((resolve, reject) => {
             superagent
                 .put(url)
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
-                .send({
-                    PartitionKey: data.key,
-                    RowKey: data.row,
-                    title: data.title,
-                    done: data.done
-                })
+                .send(data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+            });
+    },
+
+    async remove(id, params) {
+        let url = `${this.base_url}${this.table}(PartitionKey='${id.PartitionKey}',RowKey='${id.RowKey}')${this.sas}`;
+
+        return new Promise((resolve, reject) => {
+            superagent
+                .delete(url)
+                .set('If-Match', '*')
                 .then(res => resolve(res))
                 .catch(err => reject(err));
             });
@@ -51,218 +53,121 @@ business.use('table', {
         this.name = 'storetodoapp001';
         this.base_url = `https://${this.name}.table.core.windows.net/`;
         this.table = 'todos';
-        this.sas = '?sv=2019-02-02&ss=t&srt=sco&sp=rwlacu&se=2020-02-29T06:06:35Z&st=2020-02-11T22:06:35Z&spr=https&sig=XYRJzKv1WM18RSWb2XhORFIz6e5JNQsBdzlw%2FB1mttw%3D';
+        this.sas = '?sv=2019-02-02&ss=t&srt=sco&sp=rwdlacu&se=2020-02-29T09:00:30Z&st=2020-02-14T01:00:30Z&spr=https&sig=wXm9yTtv5HTmgD9v6HzHQrsxewPt5g7KM0%2FJH0VFFzs%3D';
     }
 });
 
 business.setup();
 
-/*
-    TODO COMPONENT
-*/
-
-let TodoTitle = Vue.extend({
-    props: ['title'],
-    template: '<div class="todos__title">{{ title }}</div>'
-});
-
-let TodoDone = Vue.extend({
-    props: ['id', 'row', 'done'],
-    template: '<div class="todos__done"> \
-                    <input type="checkbox" :id="\'check\' + id + row" v-model="done" /> \
-                    <label :for="\'check\' + id + row" @click="$emit(\'done\', id, row)"></label> \
-                </div>'
-});
-
-let TodoItem = Vue.extend({
-    props: ['todo'],
-    components: {
-        TodoTitle,
-        TodoDone,
+const app = new Vue({
+    el: '.app',
+    data: {
+        task: '',
+        todos: [
+            { id: 1, title: 'lorem ipsum A', done: false, edit_mode: false },
+            { id: 2, title: 'lorem ipsum B', done: true, edit_mode: false },
+            { id: 3, title: 'lorem ipsum C', done: false, edit_mode: false }
+        ],
+        query: (t) => t === t,
     },
-    template: '<li class="todos__item"><TodoDone :id="todo.PartitionKey" :row="todo.RowKey" :done="todo.done" @done="(key, row) => $emit(\'done\', key, row)" /><TodoTitle :title="todo.title" /></li>'
-});
-
-let TodoList = Vue.extend({
-    props: ['todos'],
-    components: {
-        TodoItem
-    },
-    template: '<ul class="todos"><TodoItem v-for="item in todos" :todo="item" @done="(key, row) => $emit(\'done\', key, row)"/></ul>'
-});
-
-
-/*
-    INTRO COMPONENT
-*/
-
-let IntroText = Vue.extend({
-    template: '<input class="input intro__text" type="text" placeholder="Add a task" v-model="text" @keyup="sendTodo" />',
-    data: () => {
-        return {
-            text: '',
+    computed: {
+        get_todos() {
+            return this.todos.filter(this.query);
         }
     },
     methods: {
-        sendTodo(e) {
-            if (e.keyCode === 13 && this.text !== '') {
-                this.$emit('add', this.text);
-                this.text = '';
-            }
-        }
-    }
-});
-
-let IntroContent = Vue.extend({
-    components: {
-        IntroText
-    },
-    template: '<div class="intro__content"><IntroText @add="(text) => { $emit(\'add\', text); }" /></div>'
-});
-
-let Intro = Vue.extend({
-    components: {
-        IntroContent,
-    },
-    template: '<div class="intro"><IntroContent @add="(text) => { $emit(\'add\', text); }"/></div>'
-});
-
-
-/*
-    APP HEADER COMPONENT
-*/
-
-let AppSubtitle = Vue.extend({
-    template: '<p class="app__subtitle">{{ currentDate }}</p>',
-    data: () => {
-        return {
-            currentDate: new Date().toDateString()
-        };
-    }
-});
-
-let AppTitle = Vue.extend({
-    props: ['title'],
-    template: '<h1 class="app__title">{{ title }}</h1>'
-});
-
-let AppHeader = Vue.extend({
-    props: ['title'],
-    components: {
-        AppTitle,
-        AppSubtitle,
-    },
-    template: '<header class="app__header"><AppTitle :title="title" /><AppSubtitle /></header>'
-});
-
-let AppContent = Vue.extend({
-    components: {
-        TodoList,
-        Intro
-    },
-    data: () => {
-        return {
-            todos: []
-        };
-    },
-    template: '<div class="app__content"><TodoList :todos="todos" @done="doneTodo"/><Intro @add="addTodo"/></div>',
-    methods: {
-        addTodo(title) {
-            business
-                .service('table')
-                .create({
-                    title: title
-                })
+        add() {
+            let sorted = this.todos.sort((a,b) => b.id - a.id);
+            
+            business.service('table').create({
+                PartitionKey: 'personal',
+                RowKey: new String(parseInt(sorted[0].id) + 1),
+                title: this.task,
+                done: false
+            })
                 .then(() => {
+                    this.task = '';
                     return business.service('table').find();
                 })
-                .then((res) => { 
-                    let response = res.text;
-                    this.todos = JSON.parse(response).value.map(x => {
-                        return {
-                            PartitionKey: x.PartitionKey,
-                            RowKey: x.RowKey,
-                            title: x.title,
-                            done: x.done === true
-                        };
-                    });
-                })
-                .catch(err => {
-                    console.log('>>> ERROR');
-                    console.log(err);
-                });
+                .then(this.set_todos);
         },
 
-        doneTodo(key, row) {
-            let todo = this.todos.filter(x => x.PartitionKey === key && x.RowKey === row)[0];
-
-            business
-                .service('table')
-                .update(null, {
-                    key: key,
-                    row: row,
-                    title: todo.title,
-                    done: !todo.done
-                })
+        done(id) {
+            let todo = this.todos.filter(t => t.id === id)[0];
+            business.service('table').update(todo.id, {
+                PartitionKey: todo.partition,
+                RowKey: todo.id,
+                title: todo.title,
+                done: !todo.done
+            })
                 .then(() => {
                     return business.service('table').find();
                 })
-                .then((res) => { 
-                    let response = res.text;
-                    this.todos = JSON.parse(response).value.map(x => {
-                        return {
-                            PartitionKey: x.PartitionKey,
-                            RowKey: x.RowKey,
-                            title: x.title,
-                            done: x.done === true
-                        };
-                    });
+                .then(this.set_todos);
+        },
+
+        edit(id) {
+            let todo = this.todos.filter(t => t.id === id)[0];
+            if(todo.edit_mode === false) {
+                todo.edit_mode = !todo.edit_mode;
+            } else {
+                business.service('table').update(todo.id, {
+                    PartitionKey: todo.partition,
+                    RowKey: todo.id,
+                    title: todo.title,
+                    done: todo.done
                 })
-                .catch(err => {
-                    console.log('>>> ERROR');
-                    console.log(err);
-                });
+                    .then(() => {
+                        return business.service('table').find();
+                    })
+                    .then(this.set_todos);
+            }
+        },
+
+        filter_all() {
+            this.query = (t) => t === t;
+        },
+
+        filter_not_done() {
+            this.query = (t) => t.done === false;
+        },
+
+        remove(id) {
+            let todo = this.todos.filter(t => t.id === id)[0];
+            business.service('table').remove({
+                PartitionKey: todo.partition,
+                RowKey: todo.id,
+                title: todo.title,
+                done: todo.done
+            })
+                .then(() => {
+                    return business.service('table').find();
+                })
+                .then(this.set_todos);
+        },
+
+        remove_done() {
+            this.todos = this.todos.filter(t => t.done === false);
+        },
+
+        set_todos(res) {
+            this.todos = JSON.parse(res.text).value.map(i => {
+                return {
+                    partition: i.PartitionKey,
+                    id: i.RowKey,
+                    title: i.title,
+                    done: i.done,
+                    edit_mode: false,
+                    date: new Date(i.Timestamp)
+                };
+            });
         }
     },
-    beforeCreate() {
-        business
-            .service('table')
-            .find()
-            .then(res => {
-                let response = res.text;
-                this.todos = JSON.parse(response).value.map(x => {
-                    return {
-                        PartitionKey: x.PartitionKey,
-                        RowKey: x.RowKey,
-                        title: x.title,
-                        done: x.done === true
-                    };
-                });
-            })
-            .catch(err => {
-                console.log('>>> ERROR');
-            });
+
+    beforeMount() {
+        this.todos = [];
+        business.service('table').find().then(this.set_todos);
     }
-});
-
-let App = Vue.extend({
-    props: ['title'],
-    components: {
-        AppHeader,
-        AppContent
-    },
-    template: '<div class="app"><AppHeader :title="title" /><AppContent /></div>'
-});
-
-new Vue({
-    el: '.app',
-    components: {
-        App
-    },
-    data: {
-        title: 'Azure Todo App'
-    },
-    template: '<App :title="title"/>',
 });
 
 Vue.config.devtools = true;

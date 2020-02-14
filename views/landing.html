@@ -2,7 +2,6 @@
 <html>
     <head>
         <link href="https://fonts.googleapis.com/css?family=Montserrat:200,400&display=swap" rel="stylesheet">
-        <link href="/styles.css" rel="stylesheet">
         <title>Azure Storage Table Todo App</title>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/superagent@5.2.1/dist/superagent.min.js"></script>
@@ -10,6 +9,20 @@
         <script src="/app.js" defer="true"></script>
     </head>
     <body>
-        <div class="app"></div>
+        <div class="app">
+            <h1>Todo App</h1>
+            <input type="text" placeholder="Add task" v-model="task" @keypress.13="add" />
+            <button type="button" @click="filter_all">All</button>
+            <button type="button" @click="filter_not_done">Not done</button>
+            <ul>
+                <li v-for="todo in get_todos" :key="todo.id">
+                    <input type="checkbox" :id="todo.id" v-model="todo.done" @click="done(todo.id)" />
+                    <p v-if="todo.edit_mode === false" @click="edit(todo.id)">{{ todo.title }} - {{ todo.date }}</p>
+                    <input v-if="todo.edit_mode === true" type="text" v-model="todo.title" @keypress.13="edit(todo.id)" />
+                    <button type="button" @click="remove(todo.id)">Remove</button>
+                </li>
+            </ul>
+            <button type="button" @click="remove_done">Remove done tasks</button>
+        </div>
     </body>
 </html>
